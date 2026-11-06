@@ -5,7 +5,7 @@ A poker hand simulator
 Future updates:
 
 - Add a web version
-- add granularity to the simulation to allow for hands of same type to be ranked:  
+- add granularity to the simulation to allow for hands of same type to be ranked:
 i.e. 2 pair of 10s and 2 pair of 9s.  Currently, the simulator will only rank the
 highest pair in each hand.
 
@@ -13,6 +13,8 @@ highest pair in each hand.
 
 import random
 import click
+
+from .hand_evaluator import evaluate_hand
 
 
 def deck_of_cards():
@@ -84,7 +86,7 @@ def build_poker_hand():
         "Three of a Kind": ["10H", "10D", "10C", "KH", "AH"],
         "Two Pair": ["10H", "10D", "JC", "JH", "KH"],
         "One Pair": ["10H", "10D", "JC", "QH", "KH"],
-        "High Card": ["10H", "JD", "JC", "QH", "KH"],
+        "High Card": ["2H", "5D", "8C", "JH", "KH"],
     }
     return poker_hand
 
@@ -110,42 +112,8 @@ def display_poker_hand_probability():
 
 
 def evaluate_poker_hand(hand):
-    """
-    Evaluate a poker hand
-    """
-    # sort the hand
-    hand = sorted(hand)
-    # check for a flush
-    if len(set([card[-1] for card in hand])) == 1:
-        # check for a straight
-        if len(set([card[:-1] for card in hand])) == 5:
-            # check for a royal flush
-            if hand[0][:-1] == "10" and hand[-1][:-1] == "A":
-                return "Royal Flush"
-            else:
-                return "Straight Flush"
-        else:
-            return "Flush"
-    # check for a straight
-    elif len(set([card[:-1] for card in hand])) == 5:
-        return "Straight"
-    # check for a four of a kind
-    elif len(set([card[:-1] for card in hand])) == 2:
-        if len(set([card[:-1] for card in hand if card[:-1] == hand[0][:-1]])) == 1:
-            return "Four of a Kind"
-        else:
-            return "Full House"
-    # check for a three of a kind
-    elif len(set([card[:-1] for card in hand])) == 3:
-        if len(set([card[:-1] for card in hand if card[:-1] == hand[0][:-1]])) == 1:
-            return "Three of a Kind"
-        else:
-            return "Two Pair"
-    # check for a pair
-    elif len(set([card[:-1] for card in hand])) == 4:
-        return "One Pair"
-    else:
-        return "High Card"
+    """Backward-compatible wrapper. Delegates to hand_evaluator.evaluate_hand."""
+    return evaluate_hand(hand)
 
 
 def simulate_hands(deck, hands):
